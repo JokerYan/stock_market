@@ -20,6 +20,11 @@ class minute:
         self.VOL = int(VOL[:-1])
         self.sequence = int(self.date+self.time)
         self.index = int(index)
+        def get_OBV(self, temp_data = data[self.index - 1]):
+            if temp_data.closeP > self.closeP:
+                theta = 1
+            else:
+                theta = -1
 
 data = []
 for i in range(len(content)):
