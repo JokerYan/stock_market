@@ -22,77 +22,131 @@ class bundle:
         self.VOL = int(VOL[:-1])
         self.sequence = int(self.date+self.time)
         self.index = int(index)
+        self.get_OBV()
+        self.get_MA5()
+        self.get_MA6()
+        self.BIAS6()
+        self.PSY12()
+        self.SY()
+        self.ASY5()
+        self.ASY4()
+        self.ASY3()
+        self.ASY2()
+        self.ASY1()
 
 
-        def stochastic_K(self):
+    def stochastic_K(self):
+        try:
             temp_data = data[self.index-n+1:]
 
 
-        def get_OBV(self):
+    def get_OBV(self):
+        try:
             temp_data = data[self.index - 1]
             if temp_data.closeP > self.closeP:
                 theta = 1
             else:
                 theta = -1
-            self.OBV = temp_data.get_OBV() + theta * VOL
-            return self.OBV
-        def get_MA5(self):
+            self.OBV = temp_data.get_OBV() + theta * self.VOL
+        except:
+            self.OBV = 'invalid'
+
+    def get_MA5(self):
+        try:
             temp_data = data[self.index - 4:self.index + 1]
             s = 0.0
             for i in temp_data:
                 s += i.closeP
             s /= 5
-            return s
-        def get_MA6(self):
+            self.MA5 = s
+        except:
+            self.MAS = 'invalid'
+
+    def get_MA6(self):
+        try:
             temp_data = data[self.index - 5:self.index + 1]
             s = 0.0
             for i in temp_data:
                 s += i.closeP
             s /= 6
-            return s
-        def get_BIAS6(self):
-            return (float(self.closeP) - self.get_MA6())/self.get_MA6()
-        def get_PSY12(self):
+            self.MA6 = s
+        except:
+            self.MA6 = 'invalid'
+
+    def get_BIAS6(self):
+        try:
+            self.BIAS6 =  (float(self.closeP) - self.get_MA6())/self.get_MA6()
+        except:
+            self.BIAS6 = 'invalid'
+
+    def get_PSY12(self):
+        try:
             temp_data = data[self.index - n + 1:self.index + 1]
             A = 0
             for i in temp_data:
                 if i.closeP > i.openP:
                     A += 1
-            return A / 12.0
-        def get_SY:
+            self.PSY12 = A / 12.0
+        except:
+            self.PSY12 = 'invalid'
+
+    def get_SY(self):
+        try:
             temp_data = data[self.index - 1]
-            return (math.log(self.closeP) - math.log(temp_data.closeP)) * 100.0
-        def get_ASY5:
+            self.SY = (math.log(self.closeP) - math.log(temp_data.closeP)) * 100.0
+        except:
+            self.SY = 'invalid'
+
+    def get_ASY5(self):
+        try:
             temp_data = data[self.index - 4:self.index + 1]
             s = 0.0
             for i in temp_data:
                 s += i.get_SY()
             s /= 5
-            return s
-        def get_ASY4:
+            self.ASY5 = s
+        except:
+            self.ASY5 = 'invalid'
+
+    def get_ASY4(self):
+        try:
             temp_data = data[self.index - 3:self.index + 1]
             s = 0.0
             for i in temp_data:
                 s += i.get_SY()
             s /= 4
-            return s
-        def get_ASY3:
-            temp_data = data[self.index - 2:self.index + 1]
-            s = 0.0
-            for i in temp_data:
-                s += i.get_SY()
-            s /= 3
-            return s
-        def get_ASY2:
+            self.ASY4 = s
+        except:
+            self.ASY4 = 'invalid'
+
+    def get_ASY3(self):
+        try:
+                temp_data = data[self.index - 2:self.index + 1]
+                s = 0.0
+                for i in temp_data:
+                    s += i.get_SY()
+                s /= 3
+                self.ASY3 = s
+        except:
+            self.ASY3 = 'invalid'
+
+    def get_ASY2(self):
+        try:
             temp_data = data[self.index - 1:self.index + 1]
             s = 0.0
             for i in temp_data:
                 s += i.get_SY()
             s /= 2
-            return s
-        def get_ASY1:
+            self.ASY2 = s
+        except:
+            self.ASY2 = 'invalid'
+
+    def get_ASY1(self):
+        try:
             temp_data = data[self.index - 1]
-            return temp_data.get_SY()
+            self.ASY1 = temp_data.get_SY()
+        except:
+            self.ASY1 = 'invalid'
 
 
 all_data = []
@@ -118,7 +172,6 @@ for i in range(len(all_data)-1,t-1,-1*t):
 for i in range(len(temp_data)-1,-1,-1):
     data.append(temp_data[i])
     data[-1].index = len(data)-1
-print data[:10],data[-10:]
 
 
 
