@@ -10,7 +10,7 @@ for i in range(len(content)):
     content[i] = content[i].split(';')
 n = 5
 t = 60
-class minute:
+class bundle:
     def __init__(self,name,date,time,openP,highP,lowP,closeP,VOL,index):
         self.name = str(name)
         self.date = str(date)
@@ -25,7 +25,7 @@ class minute:
 
 
         def stochastic_K(self):
-            pass
+            temp_data = data[self.index-n+1:]
 
 
         def get_OBV(self):
@@ -95,9 +95,31 @@ class minute:
             return temp_data.get_SY()
 
 
+all_data = []
+temp_data = []
 data = []
 for i in range(len(content)):
-    data.append(minute(content[i][0],content[i][2],content[i][3],\
+    all_data.append(bundle(content[i][0],content[i][2],content[i][3],\
                        content[i][4],content[i][5],content[i][6],\
                        content[i][7],content[i][8],i))
+count = 0
+for i in range(len(all_data)-1,t-1,-1*t):
+    temp_highP = 0
+    temp_lowP = 0
+    temp_VOL = 0
+    for j in range(t):
+        if temp_highP < all_data[i-t].highP:
+            temp_highP = all_data[i-t].highP
+        if temp_lowP > all_data[i-t].lowP:
+            temp_lowP = all_data[i-t].lowP
+        temp_VOL += int(all_data[i-t].VOL)
+    temp_data.append(bundle(all_data[i].name,all_data[i-t+1].date,all_data[i-t+1].time,all_data[i-t+1].openP,\
+                            temp_highP,temp_lowP,all_data[i].closeP,str(temp_VOL)+' ',0))
+for i in range(len(temp_data)-1,-1,-1):
+    data.append(temp_data[i])
+    data[-1].index = len(data)-1
+print data[:10],data[-10:]
+
+
+
 
