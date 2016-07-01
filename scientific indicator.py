@@ -172,7 +172,7 @@ class bundle:
 
     def get_CCI(self):
         try:
-            self.CCI = (self.Mt - self.SMt)/(0,015*self.Dt)
+            self.CCI = (self.Mt - self.SMt) / (0.015 * self.Dt)
         except:
             self.CCI = 'invalid'
 
