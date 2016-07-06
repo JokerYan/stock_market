@@ -1,6 +1,8 @@
 import math
 
+output_file_name = 'scientific indicator.txt'
 f = open('0US1.MSFT_160101_160531.txt','r')
+O = open(output_file_name,'w')
 content = []
 for line in f:
     content.append(line)
@@ -48,6 +50,16 @@ class bundle:
         self.get_Dt() #not included
         self.get_CCI()
         self.get_RSI()
+
+    def output_data(self):
+        global O
+        O.write(str(self.index)+';'+str(self.OBV)+";"+str(self.MA5)+";"+str(self.MA6)+";"+str(self.BIAS6)\
+                +";"+str(self.PSY12)+";"+str(self.SY)+";"+str(self.ASY5)+";"+str(self.ASY4)+";"+str(self.ASY3)\
+                + ";" + str(self.ASY2)+";"+str(self.ASY1)+";"+str(self.stochastic_K)+";"+str(self.stochastic_D) \
+                + ";" + str(self.stochastic_slow_D)+";"+str(self.momentum)+";"+str(self.ROC)+";"+str(self.LW_R) \
+                + ";" + str(self.AO_oscillator)+";"+str(self.disparity5)+";"+str(self.disparity10)+";"+str(self.OSCP) \
+                +";"+str(self.CCI)+";"+str(self.RSI)+'\n')
+        # O.write(str(self.index)+';'+str(self.openP)+';'+str(self.highP)+';'+str(self.lowP)+';'+str(self.VOL)+'\n')
 
 
     def get_stochastic_K(self):
@@ -322,7 +334,9 @@ for i in range(len(all_data)-1,t-1,-1*t):
 for i in range(len(reverse_data)-1,-1,-1):
     data.append(reverse_data[i])
     data[-1].index = len(data)-1
-
+for i in range(len(data)):
+    data[i].output_data()
+O.close()
 
 
 
