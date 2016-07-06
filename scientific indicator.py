@@ -77,7 +77,7 @@ class bundle:
         global O
         O.write(str(self.index)+','+str(self.OBV)+","+str(self.MA5)+","+str(self.BIAS6)\
                 +","+str(self.PSY12)+","+str(self.ASY5)+","+str(self.ASY4)+","+str(self.ASY3)\
-                + "," + str(self.ASY2)+","+str(self.ASY1)+","+str(self.stochastic_K)+"."+str(self.stochastic_D) \
+                + "," + str(self.ASY2)+","+str(self.ASY1)+","+str(self.stochastic_K)+","+str(self.stochastic_D) \
                 + "," + str(self.stochastic_slow_D)+","+str(self.momentum)+","+str(self.ROC)+","+str(self.LW_R) \
                 + "," + str(self.AO_oscillator)+","+str(self.disparity5)+","+str(self.disparity10)+","+str(self.OSCP) \
                 +","+str(self.CCI)+","+str(self.RSI)+','+str(self.future_profitable)+'\n')
@@ -103,6 +103,8 @@ class bundle:
 
     def get_stochastic_D(self):
         try:
+            if self.index-n+1<0:
+                raise IndexError
             temp_data = data[self.index-n+1:self.index+1]
             sum = 0
             for i in range(len(temp_data)):
@@ -113,6 +115,8 @@ class bundle:
 
     def get_stochastic_slow_D(self):
         try:
+            if self.index-n+1<0:
+                raise IndexError
             temp_data = data[self.index-n+1:self.index+1]
             sum = 0
             for i in range(len(temp_data)):
@@ -123,6 +127,8 @@ class bundle:
 
     def get_momentum(self):
         try:
+            if self.index-n+1<0:
+                raise IndexError
             self.momentum = self.closeP - data[self.index-n+1].closeP
         except:
             self.momentum = 'invalid'
@@ -150,8 +156,8 @@ class bundle:
     def get_AO_oscillator(self):
         try:
             self.AO_oscillator = (self.highP - data[self.index-1].closeP)/(self.highP - self.lowP)
-        except:
-            self.AO_oscillator = 'invalid'
+        except ZeroDivisionError:
+            self.AO_oscillator = 10
 
     def get_disparity5(self):
         try:
@@ -227,7 +233,7 @@ class bundle:
         except IndexError:
             self.RSI = 'invalid'
         except ZeroDivisionError:
-            self.RSI = 10000
+            self.RSI = 1000
 
     def get_OBV(self):
         # try:
@@ -248,6 +254,8 @@ class bundle:
 
     def get_MA5(self):
         try:
+            if self.index-4<0:
+                raise IndexError
             temp_data = data[self.index - 4:self.index + 1]
             s = 0.0
             for i in temp_data:
@@ -255,7 +263,7 @@ class bundle:
             s /= 5
             self.MA5 = s
         except:
-            self.MAS = 'invalid'
+            self.MA5 = 'invalid'
 
     def get_MA6(self):
         try:
@@ -274,10 +282,15 @@ class bundle:
         except IndexError:
             self.BIAS6 = 'invalid'
         except ZeroDivisionError:
-            self.BIAS6 = 10000
+            if float(self.closeP) - self.MA6>0:
+                self.BIAS6 = 0.1
+            else:
+                self.BIAS6 = -0.1
 
     def get_PSY12(self):
         try:
+            if self.index - n + 1<0:
+                raise IndexError
             temp_data = data[self.index - n + 1:self.index + 1]
             A = 0
             for i in temp_data:
@@ -296,6 +309,8 @@ class bundle:
 
     def get_ASY5(self):
         try:
+            if self.index-4<0:
+                raise IndexError
             temp_data = data[self.index - 4:self.index + 1]
             s = 0.0
             for i in temp_data:
@@ -307,6 +322,8 @@ class bundle:
 
     def get_ASY4(self):
         try:
+            if self.index-3<0:
+                raise IndexError
             temp_data = data[self.index - 3:self.index + 1]
             s = 0.0
             for i in temp_data:
@@ -318,17 +335,21 @@ class bundle:
 
     def get_ASY3(self):
         try:
-                temp_data = data[self.index - 2:self.index + 1]
-                s = 0.0
-                for i in temp_data:
-                    s += i.SY
-                s /= 3
-                self.ASY3 = s
+            if self.index-2<0:
+                raise IndexError
+            temp_data = data[self.index - 2:self.index + 1]
+            s = 0.0
+            for i in temp_data:
+                s += i.SY
+            s /= 3
+            self.ASY3 = s
         except:
             self.ASY3 = 'invalid'
 
     def get_ASY2(self):
         try:
+            if self.index-1<0:
+                raise IndexError
             temp_data = data[self.index - 1:self.index + 1]
             s = 0.0
             for i in temp_data:
@@ -340,6 +361,8 @@ class bundle:
 
     def get_ASY1(self):
         try:
+            if self.index-1<0:
+                raise IndexError
             temp_data = data[self.index - 1]
             self.ASY1 = temp_data.SY
         except:
@@ -373,7 +396,7 @@ for i in range(len(data)):
     data[i].create_indicator()
 O.write('index' + ',' + 'OBV' + "," + 'MA5' + "," + 'BIAS6' \
         + "," + "PSY12" + "," +'ASY5' + "," + 'ASY4' + "," + "ASY3" \
-        + "," + "ASY2" + "," + 'ASY1' + "," + 'stochastic_K' + "." +'(stochastic_D' \
+        + "," + "ASY2" + "," + 'ASY1' + "," + 'stochastic_K' + "," +'stochastic_D' \
         + "," + 'stochastic_slow_D' + "," + 'momentum' + "," + 'ROC' + "," + 'LW_R' \
         + "," + 'AO_oscillator' + "," + 'disparity5' + "," + 'disparity10' + "," + 'OSCP' \
         + "," + 'CCI' + "," + 'RSI' + 'future_profitable'+'\n')
