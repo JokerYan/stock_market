@@ -54,6 +54,24 @@ class bundle:
         self.get_Dt() #not included
         self.get_CCI()
         self.get_RSI()
+        self.get_future_profitable()
+
+    def get_future_profitable(self):
+        try:
+            temp_data = data[self.index:self.index+6]
+            if self.index+6 > len(data)-1:
+                raise IndexError
+            temp_highP = self.highP
+            temp_lowP = self.lowP
+            for i in temp_data:
+                if i.highP > temp_highP:
+                    temp_highP = i.highP
+                if i.lowP < temp_lowP:
+                    temp_lowP = i.lowP
+            self.future_profitable = (temp_highP - self.highP) - (self.lowP - temp_lowP)
+        except IndexError:
+            self.future_profitable = 'invalid'
+
 
     def output_data(self):
         global O
@@ -62,7 +80,7 @@ class bundle:
                 + "," + str(self.ASY2)+","+str(self.ASY1)+","+str(self.stochastic_K)+"."+str(self.stochastic_D) \
                 + "," + str(self.stochastic_slow_D)+","+str(self.momentum)+","+str(self.ROC)+","+str(self.LW_R) \
                 + "," + str(self.AO_oscillator)+","+str(self.disparity5)+","+str(self.disparity10)+","+str(self.OSCP) \
-                +","+str(self.CCI)+","+str(self.RSI)+'\n')
+                +","+str(self.CCI)+","+str(self.RSI)+','+str(self.future_profitable)+'\n')
         # O.write(str(self.index)+';'+str(self.openP)+';'+str(self.highP)+';'+str(self.lowP)+';'+str(self.VOL)+'\n')
 
     def output_info(self):
@@ -100,7 +118,7 @@ class bundle:
             for i in range(len(temp_data)):
                 sum += temp_data[i].stochastic_D
             self.stochastic_slow_D = sum/n
-        except IndexError:
+        except:
             self.stochastic_slow_D = 'invalid'
 
     def get_momentum(self):
@@ -198,8 +216,8 @@ class bundle:
     def get_RSI(self):
         try:
             temp_data = data[self.index - n:self.index+1]
-            up_sum = 0.0001
-            down_sum = 0.0001
+            up_sum = 0.
+            down_sum = 0
             for i in range(len(temp_data)-1):
                 if temp_data[i].closeP < temp_data[i+1].closeP:
                     up_sum += float(temp_data[i+1].closeP - temp_data[i].closeP)
@@ -208,6 +226,8 @@ class bundle:
             self.RSI = 100-100/(1+(up_sum/n)/(down_sum))
         except IndexError:
             self.RSI = 'invalid'
+        except ZeroDivisionError:
+            self.RSI = 10000
 
     def get_OBV(self):
         # try:
@@ -253,6 +273,8 @@ class bundle:
             self.BIAS6 =(float(self.closeP) - self.MA6)/self.MA6
         except IndexError:
             self.BIAS6 = 'invalid'
+        except ZeroDivisionError:
+            self.BIAS6 = 10000
 
     def get_PSY12(self):
         try:
@@ -347,13 +369,14 @@ for i in range(len(all_data)-1,t-1,-1*t):
 for i in range(len(reverse_data)-1,-1,-1):
     data.append(reverse_data[i])
     data[-1].index = len(data)-1
-    data[-1].create_indicator()
+for i in range(len(data)):
+    data[i].create_indicator()
 O.write('index' + ',' + 'OBV' + "," + 'MA5' + "," + 'BIAS6' \
         + "," + "PSY12" + "," +'ASY5' + "," + 'ASY4' + "," + "ASY3" \
         + "," + "ASY2" + "," + 'ASY1' + "," + 'stochastic_K' + "." +'(stochastic_D' \
         + "," + 'stochastic_slow_D' + "," + 'momentum' + "," + 'ROC' + "," + 'LW_R' \
         + "," + 'AO_oscillator' + "," + 'disparity5' + "," + 'disparity10' + "," + 'OSCP' \
-        + "," + 'CCI' + "," + 'RSI' + '\n')
+        + "," + 'CCI' + "," + 'RSI' + 'future_profitable'+'\n')
 I.write('name' + ',' + 'index' + ',' 'openP' + ',' + 'highP' \
         + ',' + 'lowP' + ',' + 'closeP' + ',' + 'VOL'+'\n')
 for i in range(len(data)):
