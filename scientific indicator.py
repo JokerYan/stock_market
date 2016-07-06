@@ -26,10 +26,10 @@ class bundle:
         self.index = int(index)
         self.get_OBV()
         self.get_MA5()
-        self.get_MA6()
+        self.get_MA6() #not included
         self.get_BIAS6()
         self.get_PSY12()
-        self.get_SY()
+        self.get_SY() #not included
         self.get_ASY5()
         self.get_ASY4()
         self.get_ASY3()
@@ -184,7 +184,7 @@ class bundle:
 
     def get_CCI(self):
         try:
-            self.CCI = (self.Mt - self.SMt)/(0,015*self.Dt)
+            self.CCI = (self.Mt - self.SMt) / (0.015 * self.Dt)
         except:
             self.CCI = 'invalid'
 
@@ -203,15 +203,15 @@ class bundle:
             self.RSI = 'invalid'
 
     def get_OBV(self):
-        try:
+        if self.index == 0:
+            self.OBV = 0
+        else:
             temp_data = data[self.index - 1]
             if temp_data.closeP > self.closeP:
                 theta = 1
             else:
                 theta = -1
             self.OBV = temp_data.get_OBV() + theta * self.VOL
-        except:
-            self.OBV = 'invalid'
 
     def get_MA5(self):
         try:
