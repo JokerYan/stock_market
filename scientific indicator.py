@@ -399,7 +399,7 @@ O.write('index' + ',' + 'OBV' + "," + 'MA5' + "," + 'BIAS6' \
         + "," + "ASY2" + "," + 'ASY1' + "," + 'stochastic_K' + "," +'stochastic_D' \
         + "," + 'stochastic_slow_D' + "," + 'momentum' + "," + 'ROC' + "," + 'LW_R' \
         + "," + 'AO_oscillator' + "," + 'disparity5' + "," + 'disparity10' + "," + 'OSCP' \
-        + "," + 'CCI' + "," + 'RSI' + 'future_profitable'+'\n')
+        + "," + 'CCI' + "," + 'RSI' +','+ 'future_profitable'+'\n')
 I.write('name' + ',' + 'index' + ',' 'openP' + ',' + 'highP' \
         + ',' + 'lowP' + ',' + 'closeP' + ',' + 'VOL'+'\n')
 for i in range(len(data)):
