@@ -1,8 +1,10 @@
 import math
 
 output_file_name = 'scientific indicator.csv'
+info_file_name = 'bundle information.csv'
 f = open('0US1.MSFT_160101_160531.txt','r')
 O = open(output_file_name,'w')
+I = open(info_file_name,'w')
 content = []
 for line in f:
     content.append(line)
@@ -63,6 +65,9 @@ class bundle:
                 +","+str(self.CCI)+","+str(self.RSI)+'\n')
         # O.write(str(self.index)+';'+str(self.openP)+';'+str(self.highP)+';'+str(self.lowP)+';'+str(self.VOL)+'\n')
 
+    def output_info(self):
+        I.write(str(self.name)+','+str(self.index)+','+str(self.openP)+','+str(self.highP) \
+                + ',' + str(self.lowP)+','+str(self.closeP)+','+str(self.VOL)+'\n')
 
     def get_stochastic_K(self):
         try:
@@ -106,7 +111,7 @@ class bundle:
 
     def get_ROC(self):
         try:
-            self.ROC = self.closeP/self.closeP
+            self.ROC = self.closeP/data[self.index-n].closeP
         except:
             self.ROC = 'invalid'
 
@@ -126,7 +131,7 @@ class bundle:
 
     def get_AO_oscillator(self):
         try:
-            self.AO_oscillator = (self.highP - data[self.index-1])/(self.highP - self.lowP)
+            self.AO_oscillator = (self.highP - data[self.index-1].closeP)/(self.highP - self.lowP)
         except:
             self.AO_oscillator = 'invalid'
 
@@ -193,15 +198,15 @@ class bundle:
     def get_RSI(self):
         try:
             temp_data = data[self.index - n:self.index+1]
-            up_sum = 0
-            down_sum = 0
+            up_sum = 0.0001
+            down_sum = 0.0001
             for i in range(len(temp_data)-1):
-                if temp_data[i] < temp_data[i+1]:
-                    up_sum += temp_data[i+1] - temp_data[i]
+                if temp_data[i].closeP < temp_data[i+1].closeP:
+                    up_sum += float(temp_data[i+1].closeP - temp_data[i].closeP)
                 else:
-                    down_sum += temp_data[i] - temp_data[i+1]
+                    down_sum += float(temp_data[i].closeP - temp_data[i+1].closeP)
             self.RSI = 100-100/(1+(up_sum/n)/(down_sum))
-        except:
+        except IndexError:
             self.RSI = 'invalid'
 
     def get_OBV(self):
@@ -240,13 +245,13 @@ class bundle:
                 s += i.closeP
             s /= 6
             self.MA6 = s
-        except:
+        except IndexError:
             self.MA6 = 'invalid'
 
     def get_BIAS6(self):
         try:
-            self.BIAS6 =  (float(self.closeP) - self.get_MA6())/self.get_MA6()
-        except:
+            self.BIAS6 =(float(self.closeP) - self.MA6)/self.MA6
+        except IndexError:
             self.BIAS6 = 'invalid'
 
     def get_PSY12(self):
@@ -272,7 +277,7 @@ class bundle:
             temp_data = data[self.index - 4:self.index + 1]
             s = 0.0
             for i in temp_data:
-                s += i.get_SY()
+                s += i.SY
             s /= 5
             self.ASY5 = s
         except:
@@ -283,7 +288,7 @@ class bundle:
             temp_data = data[self.index - 3:self.index + 1]
             s = 0.0
             for i in temp_data:
-                s += i.get_SY()
+                s += i.SY
             s /= 4
             self.ASY4 = s
         except:
@@ -294,7 +299,7 @@ class bundle:
                 temp_data = data[self.index - 2:self.index + 1]
                 s = 0.0
                 for i in temp_data:
-                    s += i.get_SY()
+                    s += i.SY
                 s /= 3
                 self.ASY3 = s
         except:
@@ -305,7 +310,7 @@ class bundle:
             temp_data = data[self.index - 1:self.index + 1]
             s = 0.0
             for i in temp_data:
-                s += i.get_SY()
+                s += i.SY
             s /= 2
             self.ASY2 = s
         except:
@@ -314,7 +319,7 @@ class bundle:
     def get_ASY1(self):
         try:
             temp_data = data[self.index - 1]
-            self.ASY1 = temp_data.get_SY()
+            self.ASY1 = temp_data.SY
         except:
             self.ASY1 = 'invalid'
 
@@ -349,8 +354,12 @@ O.write('index' + ',' + 'OBV' + "," + 'MA5' + "," + 'BIAS6' \
         + "," + 'stochastic_slow_D' + "," + 'momentum' + "," + 'ROC' + "," + 'LW_R' \
         + "," + 'AO_oscillator' + "," + 'disparity5' + "," + 'disparity10' + "," + 'OSCP' \
         + "," + 'CCI' + "," + 'RSI' + '\n')
+I.write('name' + ',' + 'index' + ',' 'openP' + ',' + 'highP' \
+        + ',' + 'lowP' + ',' + 'closeP' + ',' + 'VOL'+'\n')
 for i in range(len(data)):
     data[i].output_data()
+    data[i].output_info()
 O.close()
+I.close()
 
 
