@@ -53,8 +53,8 @@ class bundle:
 
     def output_data(self):
         global O
-        O.write(str(self.index)+';'+str(self.OBV)+";"+str(self.MA5)+";"+str(self.MA6)+";"+str(self.BIAS6)\
-                +";"+str(self.PSY12)+";"+str(self.SY)+";"+str(self.ASY5)+";"+str(self.ASY4)+";"+str(self.ASY3)\
+        O.write(str(self.index)+';'+str(self.OBV)+";"+str(self.MA5)+";"+str(self.BIAS6)\
+                +";"+str(self.PSY12)+";"+str(self.ASY5)+";"+str(self.ASY4)+";"+str(self.ASY3)\
                 + ";" + str(self.ASY2)+";"+str(self.ASY1)+";"+str(self.stochastic_K)+";"+str(self.stochastic_D) \
                 + ";" + str(self.stochastic_slow_D)+";"+str(self.momentum)+";"+str(self.ROC)+";"+str(self.LW_R) \
                 + ";" + str(self.AO_oscillator)+";"+str(self.disparity5)+";"+str(self.disparity10)+";"+str(self.OSCP) \
