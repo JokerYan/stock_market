@@ -1,6 +1,6 @@
 import math
 
-output_file_name = 'scientific indicator.txt'
+output_file_name = 'scientific indicator.csv'
 f = open('0US1.MSFT_160101_160531.txt','r')
 O = open(output_file_name,'w')
 content = []
@@ -24,6 +24,8 @@ class bundle:
         self.VOL = int(VOL[:-1])
         self.sequence = int(self.date+self.time)
         self.index = int(index)
+
+    def create_indicator(self):
         self.get_OBV()
         self.get_MA5()
         self.get_MA6() #not included
@@ -53,12 +55,12 @@ class bundle:
 
     def output_data(self):
         global O
-        O.write(str(self.index)+';'+str(self.OBV)+";"+str(self.MA5)+";"+str(self.BIAS6)\
-                +";"+str(self.PSY12)+";"+str(self.ASY5)+";"+str(self.ASY4)+";"+str(self.ASY3)\
-                + ";" + str(self.ASY2)+";"+str(self.ASY1)+";"+str(self.stochastic_K)+";"+str(self.stochastic_D) \
-                + ";" + str(self.stochastic_slow_D)+";"+str(self.momentum)+";"+str(self.ROC)+";"+str(self.LW_R) \
-                + ";" + str(self.AO_oscillator)+";"+str(self.disparity5)+";"+str(self.disparity10)+";"+str(self.OSCP) \
-                +";"+str(self.CCI)+";"+str(self.RSI)+'\n')
+        O.write(str(self.index)+','+str(self.OBV)+","+str(self.MA5)+","+str(self.BIAS6)\
+                +","+str(self.PSY12)+","+str(self.ASY5)+","+str(self.ASY4)+","+str(self.ASY3)\
+                + "," + str(self.ASY2)+","+str(self.ASY1)+","+str(self.stochastic_K)+"."+str(self.stochastic_D) \
+                + "," + str(self.stochastic_slow_D)+","+str(self.momentum)+","+str(self.ROC)+","+str(self.LW_R) \
+                + "," + str(self.AO_oscillator)+","+str(self.disparity5)+","+str(self.disparity10)+","+str(self.OSCP) \
+                +","+str(self.CCI)+","+str(self.RSI)+'\n')
         # O.write(str(self.index)+';'+str(self.openP)+';'+str(self.highP)+';'+str(self.lowP)+';'+str(self.VOL)+'\n')
 
 
@@ -93,7 +95,7 @@ class bundle:
             for i in range(len(temp_data)):
                 sum += temp_data[i].stochastic_D
             self.stochastic_slow_D = sum/n
-        except:
+        except IndexError:
             self.stochastic_slow_D = 'invalid'
 
     def get_momentum(self):
@@ -203,15 +205,21 @@ class bundle:
             self.RSI = 'invalid'
 
     def get_OBV(self):
-        if self.index == 0:
-            self.OBV = 0
-        else:
-            temp_data = data[self.index - 1]
-            if temp_data.closeP > self.closeP:
-                theta = 1
+        # try:
+            if self.index == 0:
+                self.OBV = 0
             else:
-                theta = -1
-            self.OBV = temp_data.get_OBV() + theta * self.VOL
+                temp_data = data[self.index - 1]
+                if temp_data.closeP > self.closeP:
+                    theta = 1
+                else:
+                    theta = -1
+                self.OBV = temp_data.OBV + theta * self.VOL
+        # except IndexError:
+        #     self.OBV = 'invalid'
+        #     raise IndexError
+
+
 
     def get_MA5(self):
         try:
@@ -334,9 +342,15 @@ for i in range(len(all_data)-1,t-1,-1*t):
 for i in range(len(reverse_data)-1,-1,-1):
     data.append(reverse_data[i])
     data[-1].index = len(data)-1
+    data[-1].create_indicator()
+O.write('index' + ',' + 'OBV' + "," + 'MA5' + "," + 'BIAS6' \
+        + "," + "PSY12" + "," +'ASY5' + "," + 'ASY4' + "," + "ASY3" \
+        + "," + "ASY2" + "," + 'ASY1' + "," + 'stochastic_K' + "." +'(stochastic_D' \
+        + "," + 'stochastic_slow_D' + "," + 'momentum' + "," + 'ROC' + "," + 'LW_R' \
+        + "," + 'AO_oscillator' + "," + 'disparity5' + "," + 'disparity10' + "," + 'OSCP' \
+        + "," + 'CCI' + "," + 'RSI' + '\n')
 for i in range(len(data)):
     data[i].output_data()
 O.close()
-
 
 
