@@ -14,6 +14,8 @@ for i in range(len(content)):
     content[i] = content[i].split(';')
 n = 5
 t = 60
+max_profitable = 0
+min_profitable = 0
 class bundle:
     def __init__(self,name,date,time,openP,highP,lowP,closeP,VOL,index):
         self.name = str(name)
@@ -72,6 +74,17 @@ class bundle:
         except IndexError:
             self.future_profitable = 'invalid'
 
+    def get_decision(self):
+        global max_profitable
+        global min_profitable
+        if self.future_profitable == "invalid":
+            self.decision = "invalid"
+        elif self.future_profitable > max_profitable * 0.1:
+            self.decision = "BUY"
+        elif self.future_profitable < min_profitable * 0.1:
+            self.decision = "SELL"
+        else:
+            self.decision = "do_nothing"
 
     def output_data(self):
         global O
@@ -80,7 +93,7 @@ class bundle:
                 + "," + str(self.ASY2)+","+str(self.ASY1)+","+str(self.stochastic_K)+","+str(self.stochastic_D) \
                 + "," + str(self.stochastic_slow_D)+","+str(self.momentum)+","+str(self.ROC)+","+str(self.LW_R) \
                 + "," + str(self.AO_oscillator)+","+str(self.disparity5)+","+str(self.disparity10)+","+str(self.OSCP) \
-                +","+str(self.CCI)+","+str(self.RSI)+','+str(self.future_profitable)+'\n')
+                +","+str(self.CCI)+","+str(self.RSI)+','+str(self.future_profitable)+','+str(self.decision)+'\n')
         # O.write(str(self.index)+';'+str(self.openP)+';'+str(self.highP)+';'+str(self.lowP)+';'+str(self.VOL)+'\n')
 
     def output_info(self):
@@ -394,12 +407,22 @@ for i in range(len(reverse_data)-1,-1,-1):
     data[-1].index = len(data)-1
 for i in range(len(data)):
     data[i].create_indicator()
+profitable_list = []
+for i in range(len(data)):
+    t = data[i].future_profitable
+    if t != "invalid":
+        profitable_list.append(t)
+max_profitable = max(profitable_list)
+min_profitable = min(profitable_list)
+for i in range(len(data)):
+    data[i].get_decision()
 O.write('index' + ',' + 'OBV' + "," + 'MA5' + "," + 'BIAS6' \
         + "," + "PSY12" + "," +'ASY5' + "," + 'ASY4' + "," + "ASY3" \
         + "," + "ASY2" + "," + 'ASY1' + "," + 'stochastic_K' + "," +'stochastic_D' \
         + "," + 'stochastic_slow_D' + "," + 'momentum' + "," + 'ROC' + "," + 'LW_R' \
         + "," + 'AO_oscillator' + "," + 'disparity5' + "," + 'disparity10' + "," + 'OSCP' \
-        + "," + 'CCI' + "," + 'RSI' +','+ 'future_profitable'+'\n')
+        + "," + 'CCI' + "," + 'RSI' + ',' + 'future_profitable' \
+        + ',' + 'decision' + '\n')
 I.write('name' + ',' + 'index' + ',' 'openP' + ',' + 'highP' \
         + ',' + 'lowP' + ',' + 'closeP' + ',' + 'VOL'+'\n')
 for i in range(len(data)):
