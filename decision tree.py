@@ -4,11 +4,12 @@ data = []
 extra_data = []
 used_data = []
 extra_data_2 = []
+total_volume = 5877
 for line in f:
-    if len(data)>= 500:
+    if len(data)>= total_volume*5/6:
         extra_data.append(line.split(','))
         extra_data[-1][-1] = extra_data[-1][-1][:-1]
-    elif len(data) >= 400:
+    elif len(data) >= total_volume*4/6:
         extra_data_2.append(line.split(','))
         extra_data_2[-1][-1] = extra_data_2[-1][-1][:-1]
     else:
@@ -64,6 +65,8 @@ except IOError:
     f.close()
 all_highest_predictions = []
 all_voting_accuracy = []
+all_voting_accuracy_2 = []
+all_voting_volume_2 = []
 for sequence in range(0,3):
     f = open('permutation.txt', 'r')
     prediction_accuracy = []
@@ -178,6 +181,9 @@ for sequence in range(0,3):
     permutation_txt = f.read().splitlines()
     voting_results = []
     voting_accuracy = 0
+    voting_results_2 = []
+    voting_accuracy_2 = 0
+    volume_2 = 0
     for i in range(len(extra_data_2)):
         test_set_2 = []
         buy_voting = 0
@@ -195,7 +201,10 @@ for sequence in range(0,3):
             elif new_prediction == 'SELL':
                 sell_voting += all_prediction_results[j][6] * all_prediction_results[j][1] / (all_prediction_results[j][3] *100)/2
             elif new_prediction == 'do_nothing':
-                do_nothing_voting += all_prediction_results[j][7] * all_prediction_results[j][1] / (all_prediction_results[j][4] *100)/2
+                try:
+                    do_nothing_voting += all_prediction_results[j][7] * all_prediction_results[j][1] / (all_prediction_results[j][4] *100)/2
+                except ZeroDivisionError:
+                    pass
         if buy_voting > sell_voting and buy_voting > do_nothing_voting:
             voting_results.append('BUY')
         elif sell_voting > buy_voting and sell_voting > do_nothing_voting:
@@ -204,8 +213,18 @@ for sequence in range(0,3):
             voting_results.append('do_nothing')
         if voting_results[-1] == extra_data_2[i][-1]:
             voting_accuracy += 1
-    all_voting_accuracy.append(voting_accuracy)
+        if voting_results[-1] == 'BUY' or voting_results[-1] == 'SELL':
+            volume_2 += 1
+            if voting_results[-1] == extra_data_2[i][-1]:
+                voting_accuracy_2 += 1
+    try:
+        all_voting_accuracy.append(voting_accuracy/ float(len(extra_data_2)) * 100)
+        all_voting_accuracy_2.append(voting_accuracy_2/float(volume_2)*100)
+        all_voting_volume_2.append(volume_2)
+    except ZeroDivisionError:
+        pass
+
 
     p.close()
     f.close()
-print all_voting_accuracy
+print all_voting_accuracy,all_voting_accuracy_2,all_voting_volume_2
