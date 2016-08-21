@@ -1,5 +1,4 @@
 import math
-
 output_file_name = 'scientific indicator.csv'
 info_file_name = 'bundle information.csv'
 f = open('US1.MSFT_130101_160531.txt','r')
@@ -10,13 +9,14 @@ for line in f:
     content.append(line)
 f.close()
 content = content[1:]
-print len(content)
 for i in range(len(content)):
     content[i] = content[i].split(',')
 n = 5
 t = 1
+boundary = 0.1
 max_profitable = 0
 min_profitable = 0
+print len(content)/t
 class bundle:
     def __init__(self,name,date,time,openP,highP,lowP,closeP,VOL,index):
         self.name = str(name)
@@ -80,10 +80,10 @@ class bundle:
         global min_profitable
         if self.future_profitable == "invalid":
             self.decision = "invalid"
-        elif self.future_profitable > max_profitable * 0.1:
+        elif self.future_profitable > max_profitable * boundary:
         # elif self.future_profitable > 0:
             self.decision = "BUY"
-        elif self.future_profitable < min_profitable * 0.1:
+        elif self.future_profitable < min_profitable * boundary:
         # elif self.future_profitable < 0:
             self.decision = "SELL"
         else:

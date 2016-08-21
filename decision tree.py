@@ -1,22 +1,35 @@
 file_name = 'scientific indicator.csv'
+info_file_name = 'bundle information.csv'
 f = open(file_name,'r')
+I = open(info_file_name,'r')
+global_n = 5
 data = []
 extra_data = []
 used_data = []
 extra_data_2 = []
 total_volume = 5877
+simulation_data = []
+count_len = 0
 for line in f:
-    if len(data)>= total_volume*5/6:
-        extra_data.append(line.split(','))
-        extra_data[-1][-1] = extra_data[-1][-1][:-1]
-    elif len(data) >= total_volume*4/6:
+    if count_len>= total_volume*5/6:
         extra_data_2.append(line.split(','))
         extra_data_2[-1][-1] = extra_data_2[-1][-1][:-1]
+    elif count_len >= total_volume*4/6:
+        extra_data.append(line.split(','))
+        extra_data[-1][-1] = extra_data[-1][-1][:-1]
     else:
         data.append(line.split(','))
         data[-1][-1] = data[-1][-1][:-1]
+    count_len+=1
 data = data[1:]
 f.close()
+count_len = 0
+for line in I:
+    if count_len >= total_volume*5/6:
+        simulation_data.append(line.split(','))
+    count_len+=1
+I.close()
+
 for i in range(len(data)):
     valid = True
     for j in range(len(data[i])):
@@ -67,6 +80,7 @@ all_highest_predictions = []
 all_voting_accuracy = []
 all_voting_accuracy_2 = []
 all_voting_volume_2 = []
+all_account_balance = []
 for sequence in range(0,3):
     f = open('permutation.txt', 'r')
     prediction_accuracy = []
@@ -100,7 +114,7 @@ for sequence in range(0,3):
         classifiers[-1] = classifiers[-1].fit(training_set_temp,target_set)
 
         #test
-        s = 100
+        s = len(extra_data)
         c = 0
         buy = 0
         sell = 0
@@ -112,16 +126,16 @@ for sequence in range(0,3):
         sell_ = 0
         do_nothing_ = 0
         extra_data_temp = []
-        for i in range(len(extra_data_2)):
+        for i in range(len(extra_data)):
             extra_data_temp.append([])
             for j in range(len(line)):
                 if line[j] == '1':
-                    extra_data_temp[-1].append(extra_data_2[i][j])
+                    extra_data_temp[-1].append(extra_data[i][j])
         for n in range(0, s):
             test_input = []
             # n = 10
             test_input = extra_data_temp[n]
-            test_output = extra_data_2[n][-1]
+            test_output = extra_data[n][-1]
             prediction = classifiers[-1].predict(test_input)[0]
             # print 'target:',test_output
             if test_output == "BUY":
@@ -223,8 +237,27 @@ for sequence in range(0,3):
         all_voting_volume_2.append(volume_2)
     except ZeroDivisionError:
         pass
+    #simulation
+    account_balance = 0
+    stock_possessed = 0
+    # print len(voting_results),len(simulation_data)
+    # a = raw_input()
+    for i in range(len(voting_results)):
+        if voting_results[i] == 'BUY':
+            account_balance -= float(simulation_data[i][2])#buy at open price
+            try:
+                account_balance += float(simulation_data[i+global_n][2])
+            except IndexError:
+                account_balance += float(simulation_data[-1][2])
+    #         stock_possessed += 1
+    #     if voting_results[i] == 'SELL':
+    #         account_balance += float(simulation_data[i][2])*stock_possessed#sell at open price
+    #         stock_possessed = 0
+    # account_balance += float(simulation_data[-1][2])*stock_possessed
+    all_account_balance.append(account_balance)
 
 
     p.close()
     f.close()
-print all_voting_accuracy,all_voting_accuracy_2,all_voting_volume_2
+    I.close()
+print all_voting_accuracy,all_voting_accuracy_2,all_voting_volume_2,all_account_balance
