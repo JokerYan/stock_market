@@ -4,3 +4,5 @@ workspace.xml
 misc.xml
 stock.xml
 .idea/
+permutation.txt
+prediction_results_*.txt
